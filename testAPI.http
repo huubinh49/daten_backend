@@ -1,0 +1,47 @@
+###
+POST http://localhost:5000/auth/signup
+Content-Type: application/json
+
+{
+    "email": "testemail@gmail.com",
+    "password": "1234142"
+}
+
+### Test login successfully
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+    "email": "testemail@gmail.com",
+    "password": "1234142"
+}
+### Test login failed
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+    "email": "testemail@gmail.com",
+    "password": ""
+}
+###
+POST http://localhost:5000/auth/refresh-token
+Content-Type: application/json
+
+{
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RlbWFpbEBnbWFpbC5jb20iLCJpZCI6IjYxY2U5ZDRjZTFkNDYwODhlOTNiODZlMCIsImlhdCI6MTY0MDk0MTQ3MSwiZXhwIjoxNjQwOTg0NjcxfQ.eO5friEnl0ho3dJEjy1vuPEDydpoEOaQLSljSgVg5yw"
+}
+### Test bad refresh token
+POST http://localhost:5000/auth/refresh-token
+Content-Type: application/json
+
+{
+    "refresh_token": "werwe"
+}
+
+### Test logout
+DELETE http://localhost:5000/auth/logout
+Content-Type: application/json
+
+{
+    "refresh_token": "werwe"
+}

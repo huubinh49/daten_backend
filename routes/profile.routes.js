@@ -5,7 +5,7 @@ const router = express.Router();
 const authJWTMiddleware = require("../middleware/auth.middleware")
 const multer = require('multer')
 const storage = multer.memoryStorage();
-const limits = { fileSize: 1000 * 1000 * 4 }; // limit to 4mb
+const limits = { fileSize: 1000 * 1000 * 12 }; // limit to 12mb
 const upload = multer({ storage, limits });
 const profileController = require("../controllers/profile.controller")
 router.use(authJWTMiddleware);

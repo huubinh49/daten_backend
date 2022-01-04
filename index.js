@@ -33,9 +33,10 @@ app.use('/profile', profileRoutes);
 
 // Error handler middleware
 app.use((err, req, res, next) => {
-    res.send({
+    if(err)
+    res.status(err.status).send({
         error: err.message
-        });
+    });
 });
 const PORT = process.env.PORT || 5000;
 //Create Redis client on Redis port

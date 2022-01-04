@@ -1,18 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const SALT_ROUNDS = 12
-
-const PointSchema = new mongoose.Schema({
-    type: {
-      type: String,
-      enum: ['Point'],
-      required: true
-    },
-    coordinates: {
-      type: [Number],
-      required: true
-    }
-});
 
   
 const ProfileSchema = new mongoose.Schema({
@@ -40,7 +26,8 @@ const ProfileSchema = new mongoose.Schema({
         type: mongoose.SchemaTypes.Number
     },
     location: {
-        type: PointSchema
+        type: [Number],
+        required: true
     },
     photos: {
         type: [mongoose.SchemaTypes.String]

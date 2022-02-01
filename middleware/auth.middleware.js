@@ -5,7 +5,6 @@ module.exports = (req, res, next) => {
     try{
       // check header for the token
       const [signed, token] = req.headers['authorization'].split(" ");
-      console.log(signed, token)
       // decode token
       if (signed === "JWT" && token) {
         // verifies secret and checks if the token is expired

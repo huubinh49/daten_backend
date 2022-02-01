@@ -51,6 +51,7 @@ async function verifyRefreshToken(refreshToken) {
   return new Promise((resolve, reject) => {
     jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, payload) => {
       if(err){
+        console.log(err)
         return reject(err);
       }
       // Get user id and check in redis if the refresh token isn't expired yet
@@ -58,13 +59,30 @@ async function verifyRefreshToken(refreshToken) {
         if(err){
           return reject(createError.InternalServerError());
         }
-        if(refreshToken === reply){
-          return resolve(payload)
+        if(refreshToken == reply){
+          return resolve(payload.id)
         }
         return reject(createError.Unauthorized("Token is expired!"))
       })
     })
   })
+}
+async function refreshToken(req, res, next) {
+  const {refresh_token} = req.body;
+  if(!refresh_token) next(createError.BadRequest());
+  verifyRefreshToken(refresh_token).then((user)=>{
+    console.log('re-create access token for: ', user)
+    const newAccessToken = createAccessToken(user);
+    res.json({
+      access_token: newAccessToken,
+      refresh_token: refresh_token
+    });
+  }).catch(error=>{
+    if(error.name === "JsonWebTokenError"){
+      return next(createError.Unauthorized("Invalid token"))
+    }
+    return next(createError.Unauthorized(error.message))
+  }); 
 }
 async function login(req, res, next) {
     
@@ -99,7 +117,7 @@ async function login(req, res, next) {
         }
       }else{ 
         return next(createError.Unauthorized("Invalid credentials"));
-      }
+      }   
     })
   }
   catch (err) {
@@ -114,7 +132,8 @@ async function oauth2(req, res, next) {
   }
   try{
     const { email } = req.user;
-    let user = await User.findOne({ where: { email } });
+    console.log('user connect: ', req.user)
+    let user = await User.findOne({ 'email':  email });
     if(!user){
       // if the user login by OAuth didn't signup
       user = await req.user.save(); 
@@ -126,7 +145,7 @@ async function oauth2(req, res, next) {
       refresh_token: refreshToken 
     });
   }catch(error){
-    return next(createError[500]("Something went wrong"))
+    return next(createError[404]("An error occurs"))
   }
   
 }
@@ -156,5 +175,6 @@ module.exports = {
   oauth2,
   createRefreshToken,
   createAccessToken, 
-  verifyRefreshToken
+  verifyRefreshToken,
+  refreshToken
 }

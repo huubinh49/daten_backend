@@ -1,7 +1,5 @@
-// TODO: Create portfolio route for the user
 const express = require("express");
 const router = express.Router();
-
 const authJWTMiddleware = require("../middleware/auth.middleware")
 const multer = require('multer')
 const storage = multer.memoryStorage();
@@ -10,5 +8,7 @@ const upload = multer({ storage, limits });
 const profileController = require("../controllers/profile.controller")
 router.use(authJWTMiddleware);
 router.use(upload.any())
+router.get("/", profileController.getProfile);
 router.post('/', profileController.createProfile);
+router.post('/update', profileController.updateProfile);
 module.exports = router;

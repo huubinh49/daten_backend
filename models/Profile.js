@@ -31,6 +31,9 @@ const ProfileSchema = new mongoose.Schema({
     },
     photos: {
         type: [mongoose.SchemaTypes.String]
+    },
+    bio: {
+        typw: mongoose.SchemaTypes.String
     }
 })
 

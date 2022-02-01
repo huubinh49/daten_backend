@@ -6,7 +6,7 @@ const MessageSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
-    recipentId:{
+    recipientId:{
         type: mongoose.SchemaTypes.ObjectId,
         ref: "User",
         required: true
@@ -15,17 +15,17 @@ const MessageSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
-    isSent: {
-        type: mongoose.SchemaTypes.Boolean,
-        default: false
-    },
     isSeen: {
         type: mongoose.SchemaTypes.Boolean,
         default: false
-    },
-    sendDate: {
-        type: mongoose.SchemaTypes.Date
     }
+},
+{
+  timestamps: true
 });
 
-module.exports = Message = mongoose.model('Message', MessageSchema);
+const Message = mongoose.model('Message', MessageSchema)
+module.exports = {
+    Message,
+    MessageSchema
+}

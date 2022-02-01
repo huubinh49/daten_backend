@@ -11,7 +11,7 @@ const EvaluationSchema = new mongoose.Schema({
     },
     evaluation: {
         type: Number,
-        enum: [-1, 0, 1],
+        enum: [-1, 0, 1], // -1: rejected, 1: matched, 0: evaluating
         required: true
     }
 },

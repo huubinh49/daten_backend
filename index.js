@@ -59,6 +59,11 @@ app.listen(PORT, () => {
 // i.e. wait for existing connections
 var gracefulShutdown = function() {
     console.log("Received kill signal, shutting down gracefully.");
+// TODO: /home/huubinh49/Projects/dating_webapp/server/index.js:62
+//     fs.writeFile( "bloom_object.json", ESSerializer.serialize(bloom_filter), 'utf-8', function(err) {
+//                                        ^
+
+// ReferenceError: ESSerializer is not defined
     fs.writeFile( "bloom_object.json", ESSerializer.serialize(bloom_filter), 'utf-8', function(err) {
         process.exit()  
     })

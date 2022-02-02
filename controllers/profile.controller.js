@@ -76,7 +76,7 @@ async function getProfile(req, res, next) {
         return next(createErrors[404]("An error occurs"))
     }
 }
-// Modified updateProfile
+//TODO: Modified updateProfile
 // - check images is preserved or not
 // - update biography
 async function updateProfile(req, res, next) {
@@ -85,42 +85,31 @@ async function updateProfile(req, res, next) {
         if(!user)
             return next(createErrors[401]("This user isn't exist"))
         const {
-            name,
-            dob,
+            work,
+            bio,
+            address,
             gender,
-            interested,
-            position
+            interested
         } = req.body;
-        const location =  position.split(",")  
+        
+        let profile = await Profile.findOne(
+        {
+            "_id": user.profile
+        });
+        profile.bio = bio || profile.bio
+        profile.address = address || profile.address
+        profile.work = work || profile.work
+        profile.genderId = gender || profile.genderId
+        profile.interestedInGender = interested || profile.interestedInGender
+                
         if (req.files) {
-           
             const fileUploads = req.files.map((file, i) =>(uploadToCloudinary('user', file)))
             const fileResults = await Promise.all(fileUploads);
-            let profile = await Profile.updateOne(
-            {
-                "_id": user.profile
-            },{ 
-                userId: user._id, 
-                fullName: name,
-                dateOfBirth: dob,
-                genderId: gender,
-                interestedInGender: interested,
-                photos: fileResults.map((image) => image.url),
-                location: [parseFloat(location[0]), parseFloat(location[1])]
-            });
+            profile.photos = fileResults || profile.photos .map((image) => image.url)
+            await profile.save()
             res.status(200).send({'profile': profile})
         }else{
-            let profile = await Profile.updateOne(
-            {
-                "_id": user.profile
-            },{ 
-                userId: user._id, 
-                fullName: name,
-                dateOfBirth: dob,
-                genderId: gender,
-                interestedInGender: interested,
-                location: [parseFloat(location[0]), parseFloat(location[1])]
-            });
+            await profile.save()
             res.status(200).send({'profile': profile})
         }
     } catch (error) {

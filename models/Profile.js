@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-  
 const ProfileSchema = new mongoose.Schema({
 
     userId: {
@@ -33,8 +32,15 @@ const ProfileSchema = new mongoose.Schema({
         type: [mongoose.SchemaTypes.String]
     },
     bio: {
-        typw: mongoose.SchemaTypes.String
+        type: mongoose.SchemaTypes.String
+    },
+    address: {
+        type: mongoose.SchemaTypes.String
+    },
+    work: {
+        type: mongoose.SchemaTypes.String
     }
+
 })
 
 module.exports = Profile = mongoose.model('Profile', ProfileSchema);

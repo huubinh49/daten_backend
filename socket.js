@@ -28,13 +28,20 @@ const io = require("./config/socket")(8900, {
     //take userId and socketId from user
     socket.on("addUser", (userId) => {
       addUser(userId, socket.id);
-    //   io.emit("getUsers", socketIds);
     });
   
     // TODO: send and get message
     socket.on("sendMessage", (message) => {
-      const user = getUser(receiverId);
-      io.to(user.socketId).emit("getMessage", message);
+      const  recipientSocket = getUser(message.recipientId);
+      const  senderSocket = getUser(message.senderId);
+      try{
+        if(recipientSocket)
+        io.to(recipientSocket).emit("newMessage", message);
+        if(senderSocket)
+        io.to(senderSocket).emit("newMessage", message);
+      }catch(error){
+        console.log(error)
+      }
     });
   
     //when disconnect

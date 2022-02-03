@@ -91,7 +91,11 @@ async function updateProfile(req, res, next) {
             gender,
             interested
         } = req.body;
-        
+        console.log(work,
+            bio,
+            address,
+            gender,
+            interested)
         let profile = await Profile.findOne(
         {
             "_id": user.profile
@@ -101,12 +105,20 @@ async function updateProfile(req, res, next) {
         profile.work = work || profile.work
         profile.genderId = gender || profile.genderId
         profile.interestedInGender = interested || profile.interestedInGender
-                
-        if (req.files) {
+        console.log('Modified: ', profile)
+        if (req.files.length) {
             const fileUploads = req.files.map((file, i) =>(uploadToCloudinary('user', file)))
-            const fileResults = await Promise.all(fileUploads);
-            profile.photos = fileResults || profile.photos .map((image) => image.url)
-            await profile.save()
+            const fileResults = await Promise.all(fileUploads); 
+            for(let idx in req.files){
+                mongoIdx = req.files[idx].fieldname.split('-')[1];
+                if(mongoIdx < profile.photos.length){
+                    profile.photos[mongoIdx] = fileResults[idx].url;
+                }else{
+                    profile.photos.push(fileResults[idx].url)
+                }
+            }
+            profile.photos = fileResults.map((image) => image.url)
+            await profile.save().catch(err => {console.log(err)})
             res.status(200).send({'profile': profile})
         }else{
             await profile.save()

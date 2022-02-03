@@ -22,7 +22,8 @@ const ProfileSchema = new mongoose.Schema({
         required: true
     },
     interestedInGender: {
-        type: mongoose.SchemaTypes.Number
+        type: mongoose.SchemaTypes.Number,
+        required: true
     },
     location: {
         type: [Number],
@@ -32,13 +33,16 @@ const ProfileSchema = new mongoose.Schema({
         type: [mongoose.SchemaTypes.String]
     },
     bio: {
-        type: mongoose.SchemaTypes.String
+        type: mongoose.SchemaTypes.String,
+        default: ""
     },
     address: {
-        type: mongoose.SchemaTypes.String
+        type: mongoose.SchemaTypes.String,
+        default: ""
     },
     work: {
-        type: mongoose.SchemaTypes.String
+        type: mongoose.SchemaTypes.String,
+        default: ""
     }
 
 })

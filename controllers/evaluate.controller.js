@@ -72,6 +72,7 @@ const evaluateProfile = async (req, res, next) => {
                     res.status(200).send({
                         'matched': true
                     })
+                    return;
                 }else{
                     await redis.set(`${user_id}_${target_id}`, true);
                 }

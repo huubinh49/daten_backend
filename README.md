@@ -11,7 +11,7 @@ I will discuss about technologies and how I implement each features in future co
 ## Features:
 - [x] Authentication (Auth, OAuth2)
 - [x] Profile
-- [ ] Matching
+- [x] Matching
 - [ ] Chatting
 - [ ] Private Chatting
 - [ ] Video Call

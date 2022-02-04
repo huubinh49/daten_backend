@@ -6,4 +6,5 @@ const messageController = require("../controllers/message.controller");
 router.use(authJWTMiddleware);
 router.get('/', messageController.getMessage);
 router.post('/', messageController.createMessage);
+router.post('/seen', messageController.seenMessage);
 module.exports = router;

@@ -26,8 +26,9 @@ const getPartners = async (req, res, next) => {
             const partner_id = (doc.users[0].toString() == user_id)? doc.users[1].toString(): doc.users[0].toString();
             partner_ids.push(partner_id);
         }
+        console.log(partner_ids)
         const results = await Profile.find({
-            _id: {
+            userId: {
                 '$in': partner_ids
             }
         }, {

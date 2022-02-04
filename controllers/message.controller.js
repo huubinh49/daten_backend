@@ -1,6 +1,7 @@
 const createErrors = require("http-errors");
 const Message = require('../models/Message');
 
+// TODO: Bugs failed to retrieve messages
 const getMessage = async (req, res, next) => {
     try{
         const {
@@ -8,7 +9,9 @@ const getMessage = async (req, res, next) => {
             page, 
             per_page
         } = req.query;
-
+        console.log("Received:", target_id,
+            page, 
+            per_page)
         const ids = [req.user.id, target_id]
         const messages = await Message.find({
             'senderId': {
@@ -20,7 +23,10 @@ const getMessage = async (req, res, next) => {
         }).sort({"createdAt": 1}) // 1 meaning ascending
         .limit(per_page) // Just retrieves 2 documents
         .skip(page*per_page); // like offset, skip the first 5 documents
-        res.status(200).send(messages.toJSON())
+        console.log("Already find: ", messages)
+        res.status(200).send({
+            'messages': messages
+        })
     }catch(error){
         return next(createErrors[500]("An error occurs!"))
     }
@@ -51,8 +57,22 @@ const createMessage = async (req, res, next) => {
         return next(createErrors[500]("An error occurs!"))
     }   
 }
+const seenMessage = async (req, res, next) => {
+    try {
+        const message_id = req.body._id
+        const message = Message.findOneAndUpdate({
+            "_id": message_id
+        }, {
+            "isSeen": true
+        })
+        res.status(200).send(message.toJSON())
+    } catch (error) {
+        return next(createErrors[500]("An error occurs!"))
+    }
+}
 
 module.exports = {
     getMessage,
-    createMessage
+    createMessage,
+    seenMessage
 }

@@ -43,11 +43,12 @@ app.use((err, req, res, next) => {
     res.status(err.status).send({
         error: err.message
     });
+})
+app.use((req, res, next) => {
     res.io = io
     console.log('data received:', req.body);
     next();
 })
-
 // Connect MongoDB
 connectDB();
 // Initialize socket

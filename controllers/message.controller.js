@@ -45,7 +45,7 @@ const createMessage = async (req, res, next) => {
         })
         match.newestMessage = message._id;
         await match.save()
-
+        res.io.emit('newMessage', message);
         res.status(201).send(message.toJSON())
     }catch(error){
         return next(createErrors[500]("An error occurs!"))

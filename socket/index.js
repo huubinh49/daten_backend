@@ -1,9 +1,13 @@
-const io = require("./config/socket")(8900, {
-    cors: {
-      origin: "http://localhost:3000",
-    },
-  });
-  
+const socket = require("socket.io");
+let io
+const init = (httpServer) => {
+  // const io = require("./socket").init(8900, {
+  //   cors: {
+  //     origin: "http://localhost:3000",
+  //   },
+  // });
+  io = socket(httpServer);
+  console.log('Socket is ready!')
   let socketIds = {};
   const addUser = (userId, socketId) => {
     socketIds[userId] = socketId;
@@ -51,3 +55,15 @@ const io = require("./config/socket")(8900, {
     //   io.emit("getUsers", socketIds);
     });
   });
+  return io;
+}
+const getIO = () => {
+  if (!io) {
+    throw new Error('Socket.io is not initialized')
+  }
+  return io
+}
+module.exports = {
+  init,
+  getIO
+}

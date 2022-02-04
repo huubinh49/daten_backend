@@ -50,7 +50,7 @@ const getEvaluatingProfile = async (req, res, next) => {
         return next(createErrors[404]("An error occurs"))
     }
 }
-// TODO: check error when matching & realtime notification by socket
+// TODO: check error when matching
 const evaluateProfile = async (req, res, next) => {
     try {
         console.log('evaluating: ', req.body)
@@ -65,9 +65,10 @@ const evaluateProfile = async (req, res, next) => {
                 console.log('alsoLiked: ', alsoLiked)
                 if(alsoLiked){
                     console.log('creating match')
-                    await createMatch(user_id, target_id)
+                    const match = await createMatch(user_id, target_id)
                     console.log('done match')
                     await redis.del(`${target_id}_${user_id}`);
+                    res.io.emit("newMatch", match)
                     res.status(200).send({
                         'matched': true
                     })

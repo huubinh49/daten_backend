@@ -12,6 +12,7 @@ const createMatch = async (userIdA, userIdB) => {
     match = await Match.create({
         users: [userIdA, userIdB]
     })
+    return match
 }
 const getPartners = async (req, res, next) => {
     try {

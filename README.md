@@ -12,6 +12,6 @@ I will discuss about technologies and how I implement each features in future co
 - [x] Authentication (Auth, OAuth2)
 - [x] Profile
 - [x] Matching
-- [ ] Chatting
+- [x] Chatting (developing socket)
 - [ ] Private Chatting
 - [ ] Video Call

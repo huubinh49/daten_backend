@@ -34,7 +34,8 @@ const getPartners = async (req, res, next) => {
         }, {
             '_id': 1,
             'photos': 1,
-            'fullName': 1
+            'fullName': 1,
+            'userId': 1
         })
         res.status(200).send({'matches': results})
     } catch (error) {
@@ -66,6 +67,7 @@ const getChattedPartners = async (req, res, next) => {
             'userId': 1,
             'photos': 1,
             'fullName': 1,
+            'userId': 1
         })
         messages = messages.map(profile => ({
             'userId': profile.userId,

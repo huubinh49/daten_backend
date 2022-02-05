@@ -1,69 +1,85 @@
 const socket = require("socket.io");
-let io
-const init = (httpServer) => {
-  // const io = require("./socket").init(8900, {
-  //   cors: {
-  //     origin: "http://localhost:3000",
-  //   },
-  // });
-  io = socket(httpServer);
-  console.log('Socket is ready!')
-  let socketIds = {};
-  const addUser = (userId, socketId) => {
-    socketIds[userId] = socketId;
+
+class Socket{
+  constructor(){
+    console.log("Initializing socket")
+    this.io = null;
+    this.socketIds = {};
+  }
+  addUser(userId, socketId){
+    this.socketIds[userId] = socketId;
   };
   
-  const removeUser = (socketId) => {
-    for(let user in socketIds)
-    if(socketIds[user] == socketId){
-      socketIds[user]= null;
-      delete socketIds[user]
+  removeUser(socketId){
+    for(let user in this.socketIds)
+    if(this.socketIds[user] == socketId){
+      this.socketIds[user]= null;
+      delete this.socketIds[user]
     }
   };
   
-  const getUser = (userId) => {
-    return socketIds[userId];
+  getUser(userId){
+    return this.socketIds[userId];
   };
-  
-  io.on("connection", (socket) => {
-    //when connect
-    console.log("A user connected.");
-  
-    //take userId and socketId from user
-    socket.on("addUser", (userId) => {
-      addUser(userId, socket.id);
-    });
-  
-    // TODO: send and get message
-    socket.on("sendMessage", (message) => {
-      const  recipientSocket = getUser(message.recipientId);
-      const  senderSocket = getUser(message.senderId);
-      try{
-        if(recipientSocket)
-        io.to(recipientSocket).emit("newMessage", message);
-        if(senderSocket)
-        io.to(senderSocket).emit("newMessage", message);
-      }catch(error){
-        console.log(error)
+
+  init(httpServer) {
+
+    this.io = socket(httpServer,  {
+      cors: {
+        origins: ['http://localhost:3000']
       }
     });
-  
-    //when disconnect
-    socket.on("disconnect", () => {
-      console.log("a user disconnected!");
-      removeUser(socket.id);
-    //   io.emit("getUsers", socketIds);
+    console.log('Socket is ready!')
+   
+    
+    this.io.on("connection", (socket) => {
+      //when connect
+      console.log("A user connected.");
+    
+      //take userId and socketId from user
+      socket.on("addUser", (userId) => {
+        console.log("add user: ", userId)
+        this.addUser(userId, socket.id);
+      });
+    
+      // TODO: send and get message
+      socket.on("sendMessage", (message) => {
+        console.log("new message: ", message)
+        const  recipientSocket = this.getUser(message.recipientId);
+        const  senderSocket = this.getUser(message.senderId);
+        try{
+          if(recipientSocket)
+          this.io.to(recipientSocket).emit("newMessage", message);
+          if(senderSocket)
+          this.io.to(senderSocket).emit("newMessage", message);
+        }catch(error){
+          console.log(error)
+        }
+      });
+    
+      //when disconnect
+      socket.on("disconnect", () => {
+        console.log("a user disconnected!");
+        this.removeUser(socket.id);
+      //   this.io.emit("getUsers", this.socketIds);
+      });
     });
-  });
-  return io;
-}
-const getIO = () => {
-  if (!io) {
-    throw new Error('Socket.io is not initialized')
+    return this.io;
   }
-  return io
+  getIO (){
+    if (!this.io) {
+      throw new Error('Socket.io is not initialized')
+    }
+    return this.io
+  }
+  sendTo(userId, event, payload) {
+    try {
+      const userSocket = this.getUser(userId);
+      this.io.to(userSocket).emit(event, payload) 
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
-module.exports = {
-  init,
-  getIO
-}
+const socketServer = new Socket()
+module.exports = socketServer

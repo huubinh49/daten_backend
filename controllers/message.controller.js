@@ -1,6 +1,6 @@
 const createErrors = require("http-errors");
-const Message = require('../models/Message');
-
+const { Message } = require('../models/Message');
+const socket = require("../socket")
 // TODO: Bugs failed to retrieve messages
 const getMessage = async (req, res, next) => {
     try{
@@ -23,37 +23,43 @@ const getMessage = async (req, res, next) => {
         }).sort({"createdAt": 1}) // 1 meaning ascending
         .limit(per_page) // Just retrieves 2 documents
         .skip(page*per_page); // like offset, skip the first 5 documents
-        console.log("Already find: ", messages)
+        console.log("Already find: ", messages.length)
         res.status(200).send({
             'messages': messages
         })
     }catch(error){
+        console.log(error)
         return next(createErrors[500]("An error occurs!"))
     }
 }
 
 const createMessage = async (req, res, next) => {
     try{
+        const user_id = req.user.id
         const {
             recipientId,
             messageBody
         } = req.body;
-        const matches = Match.findOne({
+        const match = await Match.findOne({
             "users": { "$all": [user_id]}
         })
         if(!match)
         return next(createErrors[400]('Bad Request!'))
 
         const message = await Message.create({
-            'senderId': req.user.id,
+            'senderId': user_id,
             'recipientId': recipientId,
             'messageBody': messageBody
         })
-        match.newestMessage = message._id;
+        
+        match.newestMessage = message;
         await match.save()
-        res.io.emit('newMessage', message);
+        console.log("Update match: ", match)
+        socket.sendTo(user_id, 'newMessage', message);
+        socket.sendTo(recipientId, 'newMessage', message);
         res.status(201).send(message.toJSON())
     }catch(error){
+        console.log(error)
         return next(createErrors[500]("An error occurs!"))
     }   
 }

@@ -54,9 +54,11 @@ const createMessage = async (req, res, next) => {
         
         match.newestMessage = message;
         await match.save()
-        console.log("Update match: ", match)
+        // TODO: Retrieve photos & fullName of partners
         socket.sendTo(user_id, 'newMessage', message);
         socket.sendTo(recipientId, 'newMessage', message);
+        socket.sendTo(user_id, 'newChattedPartner', message);
+        socket.sendTo(recipientId, 'newChattedPartner', message);
         res.status(201).send(message.toJSON())
     }catch(error){
         console.log(error)

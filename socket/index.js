@@ -37,9 +37,9 @@ class Socket{
       console.log("A user connected.");
     
       //take userId and socketId from user
-      socket.on("addUser", (userId) => {
-        console.log("add user: ", userId)
-        this.addUser(userId, socket.id);
+      socket.on("addUser", (payload) => {
+        console.log("add user: ", payload)
+        this.addUser(payload.userId, socket.id);
       });
     
       // TODO: send and get message
@@ -75,6 +75,7 @@ class Socket{
   sendTo(userId, event, payload) {
     try {
       const userSocket = this.getUser(userId);
+      if(userSocket)
       this.io.to(userSocket).emit(event, payload) 
     } catch (error) {
       console.log(error)

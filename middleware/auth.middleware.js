@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
         // verifies secret and checks if the token is expired
         jwt.verify(token, process.env.JWT_ACCESS_SECRET, (err, decoded) =>{      
           if (err) {
-            return next(createErrors[400]("Invalid token"));    
+            return next(createErrors.Unauthorized("Invalid token"));    
           } else {
             // if everything is good, save to request for use in other routes
             req.user = decoded;    
@@ -20,7 +20,7 @@ module.exports = (req, res, next) => {
 
       } else {
         // if there is no token  
-        return next(createErrors[403]("Access denied"))
+        return next(createErrors.Unauthorized("Access denied"))
       }
     }catch(error){
       return next(createErrors.Unauthorized("Failed to authorize"))

@@ -54,11 +54,13 @@ const getChattedPartners = async (req, res, next) => {
         })
         const partner_ids = []
         const newestMessageDict = {}
+        // Get a list of chatted partners
         for await (const doc of matches.cursor()){
             const partner_id = (doc.users[0].toString() == user_id)? doc.users[1].toString(): doc.users[0].toString();
             partner_ids.push(partner_id);
             newestMessageDict[partner_id] = doc.newestMessage
         }
+        // Find partner profile
         let messages = await Profile.find({
             'userId': {
                 '$in': partner_ids

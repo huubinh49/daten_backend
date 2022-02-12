@@ -21,7 +21,7 @@ async function createProfile(req, res, next) {
         if (req.files) {
             const user = await User.findById(req.user.id);
             if(!user)
-                return next(createErrors[401]("This user isn't exist"))
+                return next(createErrors.Unauthorized("This user isn't exist"))
             
             let profile = await Profile.findOne({
                 userId: user._id.toString()

@@ -11,9 +11,8 @@ const profileRoutes = require("./routes/profile.routes");
 const matchRoutes = require("./routes/match.routes");
 const evaluateRoutes = require("./routes/evaluate.routes");
 const messageRoutes = require("./routes/message.routes");
-const socketIO = require("./socket")
-const bloom_filter = require("./config/bloom_filter")
-
+const socketIO = require("./socket");
+const bloom_filter = require("./config/bloom_filter");
 const fs = require('fs');
 const http = require('http')
 // Set up Global configuration access
@@ -59,7 +58,7 @@ app.use('/profile', profileRoutes);
 app.use('/matches', matchRoutes);
 app.use('/evaluate', evaluateRoutes);
 app.use('/messages', messageRoutes);
-
+// TODO: Add Post activity
 // this function is called when you want the server to die gracefully
 // i.e. wait for existing connections
 var gracefulShutdown = function() {

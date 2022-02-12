@@ -9,9 +9,12 @@ The server for my daten web app - a web app just like Tinder but allows users to
 I will discuss about technologies and how I implement each features in future commits.
 
 ## Features:
-- [x] Authentication (Auth, OAuth2)
+- [ ] Authentication (Auth, OAuth2)
+    - [x] Google/Facebook
+    - [ ]Email (including confirm email)
 - [x] Profile
 - [x] Matching
 - [x] Chatting (developing socket)
 - [ ] Private Chatting
-- [ ] Video Call
+- [ ] Video Call (developing socket + peerjs)
+- [ ] Post

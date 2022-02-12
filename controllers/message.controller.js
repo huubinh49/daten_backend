@@ -41,7 +41,7 @@ const createMessage = async (req, res, next) => {
             messageBody
         } = req.body;
         const match = await Match.findOne({
-            "users": { "$all": [user_id]}
+            "users": { "$all": [user_id, recipientId]}
         })
         if(!match)
         return next(createErrors[400]('Bad Request!'))
@@ -54,11 +54,41 @@ const createMessage = async (req, res, next) => {
         
         match.newestMessage = message;
         await match.save()
-        // TODO: Retrieve photos & fullName of partners
+       
         socket.sendTo(user_id, 'newMessage', message);
         socket.sendTo(recipientId, 'newMessage', message);
-        socket.sendTo(user_id, 'newChattedPartner', message);
-        socket.sendTo(recipientId, 'newChattedPartner', message);
+        // TODO: Retrieve photos & fullName of partners
+        const recipientProfile = await Profile.findOne({
+            'userId': recipientId
+        }, {
+            'userId': 1,
+            'photos': 1,
+            'fullName': 1,
+            'userId': 1
+        })
+        const senderProfile = await Profile.findOne({
+            'userId': user_id
+        }, {
+            'userId': 1,
+            'photos': 1,
+            'fullName': 1,
+            'userId': 1
+        })
+        
+        socket.sendTo(user_id, 'newChattedPartner', {
+            'userId': recipientProfile.userId,
+            'photos': recipientProfile.photos,
+            'fullName': recipientProfile.fullName,
+            'newestMessage': message.messageBody,
+            'senderId': message.senderId,
+        });
+        socket.sendTo(recipientId, 'newChattedPartner', {
+            'userId': senderProfile.userId,
+            'photos': senderProfile.photos,
+            'fullName': senderProfile.fullName,
+            'newestMessage': message.messageBody,
+            'senderId': message.senderId,
+        });
         res.status(201).send(message.toJSON())
     }catch(error){
         console.log(error)

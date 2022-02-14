@@ -1,7 +1,7 @@
 const createErrors = require("http-errors");
 const Match = require("../models/Match");
 const Profile = require("../models/Profile");
-
+const socket = require("../socket")
 const createMatch = async (userIdA, userIdB) => {    
     let match = await Match.findOne({
         "users": { "$all": [userIdA, userIdB]},
@@ -12,6 +12,14 @@ const createMatch = async (userIdA, userIdB) => {
     match = await Match.create({
         users: [userIdA, userIdB]
     })
+    const profileUserA = await Profile.findOne({
+        userId: userIdA
+    })
+    const profileUserB = await Profile.findOne({
+        userId: userIdB
+    })
+    socket.sendTo(userIdA, 'newMatch', profileUserB)
+    socket.sendTo(userIdB, 'newMatch', profileUserA)
     return match
 }
 const getPartners = async (req, res, next) => {

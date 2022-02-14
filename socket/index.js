@@ -32,9 +32,8 @@ class Socket{
     console.log("Initializing socket")
     this.io = null;
     this.UserSocket = new IDManager(); // userId - socketId
-    this.CallSocket = new IDManager(); // userId - socketId(call)
-    this.PeerIds = new IDManager(); // userId - peerId 
-    this.peers = [] // contains the userId of each peer
+    this.users = {};
+    this.socketRoomMap = {};
   }
  
   getPartnerPeerJS(peerid){
@@ -60,14 +59,62 @@ class Socket{
     this.io.on("connection", (socket) => {
       //when connect
       console.log("A user connected.");
-    
+      
       //take userId and socketId from user
       socket.on("addUser", (payload) => {
         console.log("add user: ", payload)
         this.UserSocket.add(payload.userId, socket.id);
       });
+      socket.on("call-request", (payload) => {
+        console.log("Calling to")
+        this.io.to(this.UserSocket.get(payload.toUID)).emit("call-request", payload);
+      })
+      socket.on('join-room', (roomId, userDetails) => {
+        // adding all user to a room so that we can broadcast messages
+        socket.join(roomId);
     
-      // TODO: send and get message
+        // adding map users to room
+        if (this.users[roomId]) {
+          this.users[roomId].push({ socketId: socket.id, ...userDetails });
+        } else {
+          this.users[roomId] = [{ socketId: socket.id, ...userDetails }];
+        }
+    
+        // adding map of socketid to room
+        this.socketRoomMap[socket.id] = roomId;
+        const usersInThisRoom = this.users[roomId].filter(
+          (user) => user.socketId !== socket.id
+        );
+    
+        // once a new user has joined sending the details of users who are already present in room.
+        socket.emit('users-present-in-room', usersInThisRoom);
+      });
+    
+      socket.on('initiate-signal', (payload) => {
+        const roomId = this.socketRoomMap[socket.id];
+        let room = this.users[roomId];
+        let fullName = '';
+        if (room) {
+          const user = room.find((user) => user.socketId === socket.id);
+          fullName = user.fullName;
+        }
+    
+        // once a peer wants to initiate signal, To old user sending the user details along with signal
+        this.io.to(payload.userToSignal).emit('user-joined', {
+          signal: payload.signal,
+          callerId: payload.callerId,
+          fullName,
+        });
+      });
+    
+      // once the peer acknowledge signal sending the acknowledgement back so that it can stream peer to peer.
+      socket.on('ack-signal', (payload) => {
+        this.io.to(payload.callerId).emit('signal-accepted', {
+          signal: payload.signal,
+          id: socket.id,
+        });
+      });
+
       socket.on("sendMessage", (message) => {
         console.log("new message: ", message)
         const recipientSocket = this.UserSocket.get(message.recipientId);
@@ -81,47 +128,24 @@ class Socket{
           console.log(error)
         }
       });
-      // Socket event for video call
-      socket.on('peer-connected', (userData) => {
-        const { peerId, userID } = userData;
-        const callEvents = ['reject-call', 'call', 'call-info', 'display-media', 'user-video-off', 'broadcast-message']
-        
-        callEvents.forEach(callEvent => {
-          socket.on(callEvent, (response) => {
-            socket.to(this.CallSocket.get(response.toUID)).emit(callEvent, response)
-          })
-        })
-        socket.on('call-established', (data) => {
-          this.peers.push([userID, this.PeerIds.get_reversed(data.caller)])
-        })
-        // TODO: modified that send to calling partner
-        socket.on('disconnect', () => {
-          // If a callee is disconnect, send it to other
-          const partnerPeerId = this.getPartnerPeerJS(peerId);
-          if(partnerPeerId)
-            socket.to(partnerPeerId).emit('user-disconnected', peerId)
-        });
-        socket.on('display-media', (value) => {
-            socket.to().emit('display-media', {userID, value });
-        });
-        // socket.on('broadcast-message', (message) => {
-        //     socket.to(roomID).broadcast.emit('new-broadcast-message', {...message, userData});
-        // });
-        // socket.on('reconnect-user', () => {
-        //     socket.to(roomID).broadcast.emit('new-user-connect', userData);
-        // // });
-        
-        socket.on('user-video-off', (value) => {
-          const partnerPeerId = this.getPartnerPeerJS(peerId);
-          if(partnerPeerId)
-            socket.to(partnerPeerId).emit('user-video-off', value);
-        });
-      });
       //when disconnect
       socket.on("disconnect", () => {
-        console.log("a user disconnected!");
-        this.UserSocket.remove(socket.id);
-      //   this.io.emit("getUsers", this.socketIds);
+        
+        const roomId = this.socketRoomMap[socket.id];
+        if(roomId){
+          console.log("a call disconnected!");
+          // Remove this user from room 
+          let room = this.users[roomId];
+          if (room) {
+            room = room.filter((user) => user.socketId !== socket.id);
+            this.users[roomId] = room;
+          }
+          // on disconnect sending to all users that user has disconnected
+          socket.to(roomId).broadcast.emit('user-disconnected', socket.id);
+        }else{
+          console.log("a user disconnected!");
+          this.UserSocket.remove(socket.id);
+        }
       });
     });
     return this.io;
@@ -134,7 +158,7 @@ class Socket{
   }
   sendTo(userId, event, payload) {
     try {
-      const userSocket = this.UserSocket.get(userId);
+      let userSocket = this.UserSocket.get(userId);
       if(userSocket){
         console.log("Sending event ", event, "payload: ", payload)
         this.io.to(userSocket).emit(event, payload) 
@@ -143,6 +167,7 @@ class Socket{
       console.log(error)
     }
   }
+  
 }
 const socketServer = new Socket()
 module.exports = socketServer

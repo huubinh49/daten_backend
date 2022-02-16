@@ -75,7 +75,7 @@ class Socket {
       socket.on('join-room', (roomId, userDetails) => {
         // adding all user to a room so that we can broadcast messages
         socket.join(roomId);
-
+        console.log("a user joined room")
         // adding map users to room
         if (this.users[roomId]) {
           this.users[roomId].push({
@@ -139,7 +139,6 @@ class Socket {
       });
       //when disconnect
       socket.on("disconnect", () => {
-
         const roomId = this.socketRoomMap[socket.id];
         if (roomId) {
           console.log("a call disconnected!");
@@ -149,7 +148,6 @@ class Socket {
             room = room.filter((user) => user.socketId !== socket.id);
             this.users[roomId] = room;
           }
-          // TODO: on disconnect sending to all users that user has disconnected
           socket.to(roomId).emit('user-disconnected', socket.id);
         } else {
           console.log("a user disconnected!");

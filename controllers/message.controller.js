@@ -1,7 +1,8 @@
 const createErrors = require("http-errors");
 const { Message } = require('../models/Message');
 const socket = require("../socket")
-// TODO: Bugs failed to retrieve messages
+
+
 const getMessage = async (req, res, next) => {
     try{
         const {
@@ -57,7 +58,6 @@ const createMessage = async (req, res, next) => {
        
         socket.sendTo(user_id, 'newMessage', message);
         socket.sendTo(recipientId, 'newMessage', message);
-        // TODO: Retrieve photos & fullName of partners
         const recipientProfile = await Profile.findOne({
             'userId': recipientId
         }, {

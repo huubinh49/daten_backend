@@ -75,8 +75,11 @@ var gracefulShutdown = function() {
          process.exit()
     }, 10*1000);
     // ReferenceError: ESSerializer is not defined
-    fs.writeFile( "bloom_object.json", ESSerializer.serialize(bloom_filter), 'utf-8', function(err) {
-        process.exit()  
+    fs.writeFile("bloom_object.json", ESSerializer.serialize(bloom_filter), 'utf-8', function(err) {
+        if(err){
+            console.log("Error when save bloom filter: ", err)
+            process.exit()  
+        }
     })
 }
   

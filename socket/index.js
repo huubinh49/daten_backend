@@ -75,7 +75,7 @@ class Socket {
       socket.on('join-room', (roomId, userDetails) => {
         // adding all user to a room so that we can broadcast messages
         socket.join(roomId);
-        console.log("a user joined room")
+
         // adding map users to room
         if (this.users[roomId]) {
           this.users[roomId].push({

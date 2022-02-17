@@ -4,7 +4,7 @@ const Profile = require("../models/Profile");
 const bloom_filter = require('../config/bloom_filter');
 const redis = require("../config/redis");
 const { createMatch } = require("./match.controller");
-
+const socket = require("../socket")
 const getEvaluatingProfile = async (req, res, next) => {
     try{
         const profile = await Profile.findOne({
@@ -38,9 +38,8 @@ const getEvaluatingProfile = async (req, res, next) => {
             if(profile_count >= per_page){
                 break;
             }
-            if(!bloom_filter.test(hash_str)){
+            if(!bloom_filter.test(hash_str) && profile.interestedInGender === doc.genderId){
                 results.push(doc);
-                
                 profile_count += 1;
             }
         }
@@ -68,7 +67,6 @@ const evaluateProfile = async (req, res, next) => {
                     const match = await createMatch(user_id, target_id)
                     console.log('done match')
                     await redis.del(`${target_id}_${user_id}`);
-                    res.io.emit("newMatch", match)
                     res.status(200).send({
                         'matched': true
                     })

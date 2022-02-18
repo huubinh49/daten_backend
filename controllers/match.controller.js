@@ -22,6 +22,23 @@ const createMatch = async (userIdA, userIdB) => {
     socket.sendTo(userIdB, 'newMatch', profileUserA)
     return match
 }
+const getMatch =  async (req, res, next) => {
+    try {
+        const user_id = req.user.id
+        const {
+            target_id
+        } = req.query;
+        let match = await Match.findOne({
+            "users": { "$all": [user_id, target_id]},
+        })
+        if(!match){
+            return next(createErrors[400]("They are not matched"))
+        }
+        res.status(200).send({'match': match})
+    }catch(error){
+        return next(createErrors[404]("An error occurs"))
+    }
+}
 const getPartners = async (req, res, next) => {
     try {
         const user_id = req.user.id;
@@ -96,5 +113,6 @@ const getChattedPartners = async (req, res, next) => {
 module.exports = {
     createMatch,
     getPartners,
-    getChattedPartners
+    getChattedPartners,
+    getMatch
 }

@@ -5,19 +5,21 @@ The server for my daten web app - a web app just like Tinder but allows users to
 - MERN stack
 - Redis cache
 - SocketIO
+- WebRTC (simple-peer)
 
 I will discuss about technologies and how I implement each features in future commits.
 
+## DEMO
+[![Video demo of this web app](https://img.youtube.com/vi/3JdFshvJmIo/0.jpg)](https://www.youtube.com/watch?v=3JdFshvJmIo)
+
 ## Features:
-- [ ] Authentication (Auth, OAuth2)
-    - [x] Google/Facebook
-    - [ ]Email (including confirm email)
+- [x] Authentication (Auth, OAuth2)
 - [x] Profile
 - [x] Matching
-- [x] Chatting (developing socket)
-- [ ] Private Chatting
-- [ ] Video Call (developing socket + peerjs)
-- [ ] Post
+- [x] Chatting (developing **socket**)
+- [x] Video Call (**simple-peer**)
+- [-] Private Chatting
+- [-] Post Activities
 
 
 ## How implement these features:
@@ -36,3 +38,5 @@ I will discuss about technologies and how I implement each features in future co
 - Caller will notify the target user they want to call (by **socket**), if the target user accept, they will create a room chat (randomly id by **chance**) and open new window to join this room 
 - Each user joined room automatically create a new socket that join this roomID, the main purpose of this socket connection is that listen events in the call (Ex: new user joined room, user leave room, turn on/off video, ...)
 - If new users join room, the room will create videos with the source is their streams
+
+- I develop this feature based on the code example of this [repo](https://github.com/Kannndev/webrtc-video-call-react).

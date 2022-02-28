@@ -1,6 +1,7 @@
 const createErrors = require("http-errors");
 const Match = require("../models/Match");
 const Profile = require("../models/Profile");
+const Room = require("../models/Room");
 const socket = require("../socket")
 const createMatch = async (userIdA, userIdB) => {    
     let match = await Match.findOne({
@@ -110,9 +111,48 @@ const getChattedPartners = async (req, res, next) => {
     }
 }
 
+const getPrivatelyChattedPartners = async (req, res, next) => {
+    try {
+        const user_id = req.user.id;
+        // Get matches that have user_id in users & have at least 1 message
+        let rooms = Room.find({
+            "users": { "$in": [user_id]},
+            "newestMessage":{'$ne': null}
+        })
+        const partner_ids = []
+        const newestMessageDict = {}
+        // Get a list of chatted partners
+        for await (const doc of rooms.cursor()){
+            const partner_id = (doc.users[0].toString() == user_id)? doc.users[1].toString(): doc.users[0].toString();
+            partner_ids.push(partner_id);
+            newestMessageDict[partner_id] = doc.newestMessage
+        }
+        // Find partner profile
+        let messages = await Profile.find({
+            'userId': {
+                '$in': partner_ids
+            }
+        }, {
+            'userId': 1,
+            'fullName': 1,
+            'userId': 1
+        })
+        messages = messages.map(profile => ({
+            'userId': profile.userId,
+            'fullName': profile.fullName,
+            'newestMessage': newestMessageDict[profile.userId].messageBody,
+            'senderId': newestMessageDict[profile.userId].senderId,
+        }))
+        res.status(200).send({'messages': messages})
+    } catch (error) {
+        console.log('Error at rooms: ', error)
+        return next(createErrors[404]("An error occurs"))
+    }
+}
 module.exports = {
     createMatch,
     getPartners,
     getChattedPartners,
+    getPrivatelyChattedPartners,
     getMatch
 }

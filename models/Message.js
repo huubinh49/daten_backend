@@ -8,8 +8,7 @@ const MessageSchema = new mongoose.Schema({
     },
     recipientId:{
         type: mongoose.SchemaTypes.ObjectId,
-        ref: "User",
-        required: true
+        ref: "User"
     },
     messageBody:{
         type: String,
@@ -18,6 +17,10 @@ const MessageSchema = new mongoose.Schema({
     isSeen: {
         type: mongoose.SchemaTypes.Boolean,
         default: false
+    },
+    roomId: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Room"
     }
 },
 {

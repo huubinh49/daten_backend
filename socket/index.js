@@ -1,5 +1,5 @@
 const socket = require("socket.io");
-
+const PrivateRoomManager = require("./private_room")
 class IDManager {
   constructor() {
     this.ids = {};
@@ -27,6 +27,7 @@ class IDManager {
     return null;
   }
 }
+
 class Socket {
   constructor() {
     console.log("Initializing socket")
@@ -34,6 +35,7 @@ class Socket {
     this.UserSocket = new IDManager(); // userId - socketId
     this.users = {};
     this.socketRoomMap = {};
+    this.privateRoomManager = new PrivateRoomManager();
   }
 
   getPartnerPeerJS(peerid) {
@@ -71,7 +73,7 @@ class Socket {
           this.io.to(this.UserSocket.get(payload.toUID)).emit(event, payload);
         })
       })
-
+      // For video call
       socket.on('join-room', (roomId, userDetails) => {
         // adding all user to a room so that we can broadcast messages
         socket.join(roomId);
@@ -173,6 +175,9 @@ class Socket {
     } catch (error) {
       console.log(error)
     }
+  }
+  sendToRoom(roomId, event, payload){
+    this.io.to(roomId).emit(event, payload)
   }
 
 }

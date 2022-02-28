@@ -6,5 +6,8 @@ const messageController = require("../controllers/message.controller");
 router.use(authJWTMiddleware);
 router.get('/', messageController.getMessage);
 router.post('/', messageController.createMessage);
-router.post('/seen', messageController.seenMessage);
+
+router.get('/private', messageController.getPrivateMessages);
+router.post('/private', messageController.createPrivateMessage);
+router.get('/private/room', messageController.getAvailablePrivateRoom);
 module.exports = router;

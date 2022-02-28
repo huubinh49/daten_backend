@@ -7,5 +7,6 @@ router.use(authJWTMiddleware);
 router.get('/', matchController.getMatch);
 router.get('/all', matchController.getPartners);
 router.get('/chatted', matchController.getChattedPartners)
+router.get('/private-chatted', matchController.getPrivatelyChattedPartners)
 
 module.exports = router;

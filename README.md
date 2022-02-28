@@ -18,8 +18,8 @@ I will discuss about technologies and how I implement each features in future co
 - [x] Matching
 - [x] Chatting (developing **socket**)
 - [x] Video Call (**simple-peer**)
-- [-] Private Chatting
-- [-] Post Activities
+- [ ] Private Chatting
+- [ ] Post Activities
 
 
 ## How implement these features:

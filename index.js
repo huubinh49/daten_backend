@@ -58,7 +58,6 @@ app.use('/profile', profileRoutes);
 app.use('/matches', matchRoutes);
 app.use('/evaluate', evaluateRoutes);
 app.use('/messages', messageRoutes);
-// TODO: Add Post activity
 // this function is called when you want the server to die gracefully
 // i.e. wait for existing connections
 var gracefulShutdown = function() {

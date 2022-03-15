@@ -2,7 +2,6 @@ const socket = require("socket.io");
 
 class Socket {
   constructor() {
-    console.log("Initializing socket")
     this.io = null;
     this.userSocketIDMapper = {}; // userID - socketID
   }
@@ -17,16 +16,13 @@ class Socket {
     console.log('Socket is ready!')
 
     this.io.on("connection", (socket) => {
-      console.log("A user connected.");
 
       //take userId and socketId from user
       socket.on("add-user", (payload) => {
-        console.log("add user: ", this.userSocketIDMapper.ids)
         this.userSocketIDMapper[payload.userId] = socket.id;
       });
 
       socket.on("send-message", (message) => {
-        console.log("new message: ", message)
         const recipientSocketId = this.userSocketIDMapper[message.recipientId];
         const senderSocketId = this.userSocketIDMapper[message.senderId];
         try {
@@ -40,7 +36,6 @@ class Socket {
       });
 
       socket.on("disconnect", () => {
-        console.log("a user disconnected!");
         this.userSocketIDMapper.remove(socket.id);
       });
     });
@@ -51,7 +46,6 @@ class Socket {
     try {
       const socketId = this.userSocketIDMapper[userId];
       if (socketId) {
-        console.log("Sending event ", event, "payload: ", payload)
         this.io.to(socketId).emit(event, payload)
       }
     } catch (error) {
@@ -132,8 +126,6 @@ class CallableSocket extends Socket {
       socket.on("disconnect", () => {
         const roomId = this.socketRoomIDMapper[socket.id];
         if (roomId) {
-          console.log("a call disconnected!");
-
           // Remove this user from room 
           let room = this.roomUserIdsMapper[roomId];
           if (room) {

@@ -27,13 +27,13 @@ class Socket {
 
       socket.on("send-message", (message) => {
         console.log("new message: ", message)
-        const recipientSocket = this.userSocketIDMapper[message.recipientId];
-        const senderSocket = this.userSocketIDMapper[message.senderId];
+        const recipientSocketId = this.userSocketIDMapper[message.recipientId];
+        const senderSocketId = this.userSocketIDMapper[message.senderId];
         try {
-          if (recipientSocket)
-            this.io.to(recipientSocket).emit("new-message", message);
-          if (senderSocket)
-            this.io.to(senderSocket).emit("new-message", message);
+          if (recipientSocketId)
+            this.io.to(recipientSocketId).emit("new-message", message);
+          if (senderSocketId)
+            this.io.to(senderSocketId).emit("new-message", message);
         } catch (error) {
           console.log(error)
         }
@@ -49,10 +49,10 @@ class Socket {
 
   sendToUser(userId, event, payload) {
     try {
-      const userSocket = this.userSocketIDMapper[userId];
-      if (userSocket) {
+      const socketId = this.userSocketIDMapper[userId];
+      if (socketId) {
         console.log("Sending event ", event, "payload: ", payload)
-        this.io.to(userSocket).emit(event, payload)
+        this.io.to(socketId).emit(event, payload)
       }
     } catch (error) {
       console.log(error)

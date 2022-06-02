@@ -19,8 +19,8 @@ const createMatch = async (userIdA, userIdB) => {
     const profileUserB = await Profile.findOne({
         userId: userIdB
     })
-    socket.sendTo(userIdA, 'newMatch', profileUserB)
-    socket.sendTo(userIdB, 'newMatch', profileUserA)
+    socket.sendToUser(userIdA, 'newMatch', profileUserB)
+    socket.sendToUser(userIdB, 'newMatch', profileUserA)
     return match
 }
 const getMatch =  async (req, res, next) => {

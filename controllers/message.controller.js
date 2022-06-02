@@ -76,8 +76,8 @@ const createMessage = async (req, res, next) => {
         match.newestMessage = message;
         await match.save()
        
-        socket.sendTo(user_id, 'newMessage', message);
-        socket.sendTo(recipientId, 'newMessage', message);
+        socket.sendToUser(user_id, 'newMessage', message);
+        socket.sendToUser(recipientId, 'newMessage', message);
         const recipientProfile = await Profile.findOne({
             'userId': recipientId
         }, {
@@ -95,14 +95,14 @@ const createMessage = async (req, res, next) => {
             'userId': 1
         })
         
-        socket.sendTo(user_id, 'newChattedPartner', {
+        socket.sendToUser(user_id, 'newChattedPartner', {
             'userId': recipientProfile.userId,
             'photos': recipientProfile.photos,
             'fullName': recipientProfile.fullName,
             'newestMessage': message.messageBody,
             'senderId': message.senderId,
         });
-        socket.sendTo(recipientId, 'newChattedPartner', {
+        socket.sendToUser(recipientId, 'newChattedPartner', {
             'userId': senderProfile.userId,
             'photos': senderProfile.photos,
             'fullName': senderProfile.fullName,
@@ -158,8 +158,8 @@ const createPrivateMessage = async (req, res, next) => {
         await room.save()
         const recipientId = (room.users[0] == user_id)? room.users[1]: room.users[0];
 
-        socket.sendTo(user_id, 'newPrivateMessage', message);
-        socket.sendTo(recipientId, 'newPrivateMessage', message);
+        socket.sendToUser(user_id, 'newPrivateMessage', message);
+        socket.sendToUser(recipientId, 'newPrivateMessage', message);
         const recipientProfile = await Profile.findOne({
             'userId': recipientId
         }, {
@@ -173,13 +173,13 @@ const createPrivateMessage = async (req, res, next) => {
             'userId': 1
         })
         
-        socket.sendTo(user_id, 'newPrivatelyChattedPartner', {
+        socket.sendToUser(user_id, 'newPrivatelyChattedPartner', {
             'userId': recipientProfile.userId,
             'fullName': recipientProfile.fullName,
             'newestMessage': message.messageBody,
             'senderId': message.senderId,
         });
-        socket.sendTo(recipientId, 'newChattedPartner', {
+        socket.sendToUser(recipientId, 'newChattedPartner', {
             'userId': senderProfile.userId,
             'fullName': senderProfile.fullName,
             'newestMessage': message.messageBody,
